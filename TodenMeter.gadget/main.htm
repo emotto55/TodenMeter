@@ -1,0 +1,111 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="MSThemeCompatible" CONTENT="yes" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <link href="css/Style.css" rel="stylesheet" type="text/css" />
+        <title>東電メーター</title>
+	<script type="text/javascript">
+	<!--
+	var max;
+	var tmrID    //タイマーID
+
+	function init() {
+
+		var interval = 1000 * 60 * 5;	//5分
+		//getMax();
+		getCsv();
+		
+		tmrID = setInterval( "getCsv()", interval );
+		
+	}
+	function getCsv(){
+		try{
+			httpRequest=new XMLHttpRequest();
+			httpRequest.onreadystatechange=resultFuncCsv;
+			httpRequest.open("GET", "http://www.tepco.co.jp.cache.yimg.jp/forecast/html/images/juyo-j.csv", true);
+			httpRequest.setRequestHeader("If-Modified-Since", "Thu, 01 Jun 1970 00:00:00 GMT");
+			httpRequest.send(null);
+			return null;
+		} catch(e) {}
+	}
+	function resultFuncCsv(){
+		if(httpRequest.readyState==4 && httpRequest.status==200){
+			var str;
+			var lines, line;
+			var elements, element;
+			var newUsage;
+			var updateTime;
+			var flgPeak;
+
+			flgPeak = false;
+			max = "";
+			str = httpRequest.responseText;
+			lines = str.split("\n")
+			updateTime = lines[0];
+			for (var i=0; i < lines.length; i++)
+			{
+				line = lines[i];
+				elements = line.split(",");
+				
+				if(flgPeak == true)
+				{
+					max = elements[0];
+					flgPeak = false;
+				}
+				else if(elements[0].search(/kW/) != -1)
+				{
+					if(max == ""){
+						flgPeak = true;
+					}
+				}
+				else if(elements[2] != undefined)
+				{
+					if(elements[2] == 0)
+					{
+						break;
+					}
+					newUsage = elements[2];
+				}
+			}
+			var percent = newUsage / max * 100;
+			//alert("usage=" + newUsage + ", max=" + max);
+			document.getElementById("update").innerText = updateTime;
+			document.getElementById("mainbar").style.width = percent + "%";
+			document.getElementById("mainbar").innerText = percent + "%";
+		}
+	}	
+
+	//非同期通信の開始
+	function getMax(){
+		try{
+			httpRequest=new XMLHttpRequest();
+			httpRequest.onreadystatechange=resultFuncMax;
+			httpRequest.open("GET", "http://www.tepco.co.jp.cache.yimg.jp/forecast/index-j.html", false);
+			httpRequest.send(null);
+			return null;
+		} catch(e) {}
+	}
+
+	//通信完了後の処理
+	function resultFuncMax(){
+		if(httpRequest.readyState==4 && httpRequest.status==200){
+			var str;
+			str = httpRequest.responseText;
+			str.match(/([0-9]),([0-9]{3})/);
+			max = RegExp.$1 + RegExp.$2;
+		}
+	}	
+	
+	//-->
+	</script>    
+	</head>
+ 
+    <body style="width:202px; height:60px" onload="init()">
+    <div id="update" style="height:12px">
+    </div>
+	<div id="maingraph" class="graph">
+	    <strong id="mainbar" class="bar"></strong>
+	</div>
+    </body>
+</html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gadget>
+    <name>東電メーター</name>
+    <namespace>TodenMeter</namespace>
+    <version>1.0.0.0</version>
+    <author name="kokemono">
+        <info url="d.hatena.ne.jp/kokemono" />
+    </author>
+    <copyright>2011</copyright>
+    <description>東電の電力使用状況を表示するガジェットです</description>
+	<icons>
+		<icon height="68" width="40" src="icon.png" />
+	</icons>
+    <hosts>
+        <host name="sidebar">
+          <base type="HTML" apiVersion="1.0.0" src="main.htm" />
+          <permissions>full</permissions>
+          <platform minPlatformVersion="0.3" />
+        </host>
+    </hosts>
+</gadget>
